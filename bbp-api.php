@@ -3,7 +3,7 @@
 Plugin Name: bbPress API
 Description: A bbPress REST API.
 Plugin URI: https://wordpress.org/plugins/bbp-api/
-Author: Pascal Casier
+Author: Pascal Casier, Zhongxu Yang
 Author URI: http://casier.eu/wp-dev/
 Text Domain: bbp-api
 Version: 1.0.15
@@ -38,7 +38,7 @@ add_action( 'rest_api_init', function() {
 	register_rest_route( 'bbp-api/v1', '/' . bbp_get_forum_slug() . '/', $args );
 	if ( bbp_get_forum_slug() != 'forums' )
 		register_rest_route( 'bbp-api/v1', '/forums/', $args );
-	
+
 	// FORUM One specific forum with meta data and topics
 	$args = array(
 		array(
@@ -76,7 +76,7 @@ add_action( 'rest_api_init', function() {
 	register_rest_route( 'bbp-api/v1', '/' . bbp_get_forum_slug() . '/(?P<id>\d+)', $args );
 	if ( bbp_get_forum_slug() != 'forums' )
 		register_rest_route( 'bbp-api/v1', '/forums/(?P<id>\d+)', $args );
-	
+
 	// TOPICS
 	$args = array(
 		array(
@@ -88,7 +88,7 @@ add_action( 'rest_api_init', function() {
 	register_rest_route( 'bbp-api/v1', '/' . bbp_get_topic_slug() . '/', $args );
 	if ( bbp_get_topic_slug() != 'topics' )
 		register_rest_route( 'bbp-api/v1', '/topics/', $args );
-	
+
 	// TOPIC One specific topic with meta data and replies
 	// The POST request is for a reply to this topic
 	$args = array(
@@ -121,7 +121,7 @@ add_action( 'rest_api_init', function() {
 	register_rest_route( 'bbp-api/v1', '/' . bbp_get_topic_slug() . '/(?P<id>\d+)', $args );
 	if ( bbp_get_topic_slug() != 'topics' )
 		register_rest_route( 'bbp-api/v1', '/topics/(?P<id>\d+)', $args );
-	
+
 	// REPLIES
 	$args = array(
 		'methods' => WP_REST_Server::READABLE,
@@ -131,7 +131,7 @@ add_action( 'rest_api_init', function() {
 	register_rest_route( 'bbp-api/v1', '/' . bbp_get_reply_slug() . '/', $args );
 	if ( bbp_get_reply_slug() != 'replies' )
 		register_rest_route( 'bbp-api/v1', '/replies/', $args );
-	
+
 	// REPLIES One specific reply with meta data
 	// The POST request is for a reply to this reply
 	$args = array(
@@ -175,7 +175,7 @@ add_action( 'rest_api_init', function() {
 	register_rest_route( 'bbp-api/v1', '/' . bbp_get_topic_tag_tax_slug() . '/', $args );
 	if ( bbp_get_reply_slug() != 'topic-tags' )
 		register_rest_route( 'bbp-api/v1', '/topic-tags/', $args );
-	
+
 	// STATS
 	register_rest_route( 'bbp-api/v1', '/stats/', array(
 		'methods' => WP_REST_Server::READABLE,

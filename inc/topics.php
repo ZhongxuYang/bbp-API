@@ -5,11 +5,13 @@
 function bbp_api_topics() {
 	$all_topic_data = array();
 	$bbp = bbpress();
-	
+
 	$per_page = !isset($_GET['per_page']) ? 20 : (int)$_GET['per_page'];
 	if ($per_page > 100) $per_page = 100;
-	$page = !isset($_GET['page']) ? 1 : (int)$_GET['page'];	
-	
+	$page = !isset($_GET['page']) ? 1 : (int)$_GET['page'];
+	$order = !isset($_GET['order']) ? 'DESC' : (string)$_GET['order'];
+	$orderby = !isset($_GET['orderby']) ? 'date' : (string)$_GET['orderby'];
+
 	$i = 0;
 	$all_topic_data['total_topics'] = 0;
 	$all_topic_data['total_pages'] = 0;
@@ -20,14 +22,14 @@ function bbp_api_topics() {
 	$all_topic_data['prev_page'] = 0;
 	$all_topic_data['prev_page_url'] = '';
 
-	if ( bbp_has_topics ( array( 'orderby' => 'date', 'order' => 'DESC', 'posts_per_page' => $per_page, 'paged' => $page ) ) ) {
+	if ( bbp_has_topics ( array( 'orderby' => $orderby, 'order' => $order, 'posts_per_page' => $per_page, 'paged' => $page ) ) ) {
 		$all_topic_data['current_page'] = $page;
 		$all_topic_data['per_page'] = $per_page;
 		$all_topic_data['total_topics'] = (int)$bbp->topic_query->found_posts;
 		$all_topic_data['total_pages'] = ceil($all_topic_data['total_topics'] / $per_page);
 
 		$root_url = get_site_url() . '/wp-json/bbp-api/v1/topics/';
-		
+
 		if ( ( $per_page * $page ) >= $all_topic_data['total_topics'] ) {
 			// This is the last page
 		} else {
@@ -56,7 +58,7 @@ function bbp_api_topics() {
 	} else {
 		return new WP_Error( 'error', 'No latest topics found.', array( 'status' => 404 ) );
 	}
-	
+
 	return $all_topic_data;
 }
 /*
@@ -77,6 +79,8 @@ function bbp_api_topics_one( $data ) {
 		if ($per_page > 100) $per_page = 100;
 		$page = !isset($_GET['page']) ? 1 : (int)$_GET['page'];
 		$show_reply_content = !isset($_GET['_embed']) ? false : true;
+		$order = !isset($_GET['order']) ? 'DESC' : (string)$_GET['order'];
+		$orderby = !isset($_GET['orderby']) ? 'date' : (string)$_GET['orderby'];
 
 		$all_topic_data['id'] = $topic_id;
 		$all_topic_data['title'] = bbp_get_topic_title( $topic_id );
@@ -88,9 +92,9 @@ function bbp_api_topics_one( $data ) {
 		$all_topic_data['author_avatar'] = bbp_get_topic_author_avatar( $topic_id );
 		$all_topic_data['post_date'] = bbp_get_topic_post_date( $topic_id );
 		$all_topic_data['content'] = bbp_get_topic_content( $topic_id );
-		$all_topic_data['forum_id'] = bbp_get_topic_forum_id( $topic_id ); 
+		$all_topic_data['forum_id'] = bbp_get_topic_forum_id( $topic_id );
 		$all_topic_data['forum_title'] = bbp_get_forum_title( $all_topic_data['forum_id'] );
-		
+
 		$root_url = get_site_url() . '/wp-json/bbp-api/v1/topics/' . $topic_id;
 
 		if ( ( $per_page * $page ) >= $all_topic_data['reply_count'] ) {
@@ -103,7 +107,7 @@ function bbp_api_topics_one( $data ) {
 			if ( $show_reply_content )
 				$all_topic_data['next_page_url'] = $all_topic_data['next_page_url'] . '&_embed';
 		}
-		
+
 		$i = 0;
 		$all_topic_data['total_topics'] = 0;
 		$all_topic_data['total_pages'] = 0;
@@ -114,7 +118,7 @@ function bbp_api_topics_one( $data ) {
 		$all_topic_data['prev_page'] = 0;
 		$all_topic_data['prev_page_url'] = '';
 
-		if ( bbp_has_replies ( array( 'orderby' => 'date', 'order' => 'DESC', 'posts_per_page' => $per_page, 'paged' => $page, 'post_parent' => $topic_id ) ) ) {
+		if ( bbp_has_replies ( array( 'orderby' => $orderby, 'order' => $order, 'posts_per_page' => $per_page, 'paged' => $page, 'post_parent' => $topic_id ) ) ) {
 			$all_topic_data['current_page'] = $page;
 			$all_topic_data['per_page'] = $per_page;
 			$all_topic_data['total_replies'] = (int)$bbp->reply_query->found_posts - 1; // Remove the topic that comes as first reply
@@ -177,7 +181,7 @@ function bbp_api_newtopic_post( $data ) {
 	if (bbp_is_forum_category($forum_id)) {
 		return new WP_Error( 'error', 'Forum with ID ' . $data['id'] . ' is a category, so no topics allowed', array( 'status' => 404 ) );
 	}
-	
+
 	$content = $data['content'];
 	$title = $data['title'];
 	$email = $data['email'];
@@ -194,11 +198,11 @@ function bbp_api_newtopic_post( $data ) {
 			'forum_id'     => $forum_id,
 		)
 	);
-	
+
 	$return['id'] = $new_topic_id;
 	$return['forum_id'] = $forum_id;
 	$return['author_id'] = $author_id;
-	
+
 	return $return;
 }
 
@@ -216,7 +220,7 @@ function bbp_api_replytotopic_post( $data ) {
 	if ( !bbp_is_topic( $topic_id ) ) {
 		return new WP_Error( 'error', 'Parameter value ' . $data['id'] . ' is not an ID of a topic', array( 'status' => 404 ) );
 	}
-	
+
 	$forum_id = bbp_get_topic_forum_id( $topic_id );
 	$title = 'RE: ' . bbp_get_topic_title( $topic_id );
 	$content = $data['content'];
@@ -235,11 +239,11 @@ function bbp_api_replytotopic_post( $data ) {
 			'topic_id'     => $topic_id,
 		)
 	);
-	
+
 	$return['id'] = $new_reply_id;
 	$return['topic_id'] = $topic_id;
 	$return['forum_id'] = $forum_id;
 	$return['author_id'] = $author_id;
-	
+
 	return $return;
 }

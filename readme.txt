@@ -3,14 +3,17 @@ Contributors: casiepa
 Donate link: http://casier.eu/wp-dev/
 Tags: bbpress,api,rest,rest api
 Requires at least: 4.7
-Tested up to: 4.8
-Stable tag: 1.0.14
+Tested up to: 6.7
+Stable tag: 1.0.15
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 A first attempt for a bbPress API.
 
 == Description ==
+
+**This plugin is forked from the [bbp-api](https://wordpress.org/plugins/bbp-api/) project created by [casiepa](https://profiles.wordpress.org/casiepa/), and I just made some extensions. Thank you [casiepa](https://profiles.wordpress.org/casiepa/) for providing a useful plugin!**
+
 A first attempt for a bbPress API.
 
 **WARNING This API will show all forums, topics, replies that bbPress has access to. If you have any extra plugin to restrict bbPress content, please double and triple check that everything works correctly.**
@@ -33,6 +36,11 @@ Parameters for /forums/*id* and /topics/*id* (following https://developer.wordpr
 Parameter for /topics/*id* (following https://developer.wordpress.org/rest-api/using-the-rest-api/linking-and-embedding/#embedding )
 
 * _embed    (showing content for replies)
+
+Parameter for /topics/ and /topics/*id* (following https://developer.wordpress.org/rest-api/reference/posts/#arguments )
+
+* order    (order sort attribute ascending or descending, default: desc, one of: asc, desc)
+* orderby    (sort collection by post attribute, default: date)
 
 Current routes for WRITING (POST):
 
@@ -83,11 +91,11 @@ Thanks. Please leave a review or donate 1 or 2 EUR/USD for a coffee.
 = 1.0.12 =
 * Add previous page (=0) even if there is none
 * Add current page
- 
+
 = 1.0.11 =
 * Latest topics pagination
 * Previous page, total pages and total items added for every loop
-* Fix issue where next page would not be specified 
+* Fix issue where next page would not be specified
 
 = 1.0.10 =
 * Latest topics from all visible forums
