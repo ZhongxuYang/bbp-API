@@ -203,6 +203,32 @@ function bbp_api_newtopic_post( $data ) {
 	$return['forum_id'] = $forum_id;
 	$return['author_id'] = $author_id;
 
+	// Send email to administrators
+	if ($new_topic_id) {
+		$admin_emails = array();
+		$administrators = get_users(array('role' => 'administrator'));
+		foreach ($administrators as $admin) {
+			$admin_emails[] = $admin->user_email;
+		}
+
+		$forum_title = bbp_get_forum_title($forum_id);
+		$topic_url = bbp_get_topic_permalink($new_topic_id);
+		$author_name = $myuser->display_name;
+
+		// 准备邮件内容
+		ob_start();
+		include BBPAPI_PLUGIN_DIR . '/inc/email-templates/new-topic-notification.php';
+		$message = ob_get_clean();
+
+		$subject = sprintf('[%s] 新话题通知: %s', get_bloginfo('name'), $title);
+		$headers = array(
+			'Content-Type: text/html; charset=UTF-8',
+			'From: ' . get_bloginfo('name') . ' <' . get_bloginfo('admin_email') . '>'
+		);
+
+		wp_mail($admin_emails, $subject, $message, $headers);
+	}
+
 	return $return;
 }
 
